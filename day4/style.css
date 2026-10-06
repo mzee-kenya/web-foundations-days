@@ -1,0 +1,54 @@
+﻿
+:root {
+    --background: white;
+    --text: #222;
+    --box-background: #f4f4f4;
+    --border: #ccc;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    padding: 30px;
+}
+
+main {
+    max-width: 700px;
+    margin: auto;
+}
+
+textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-top: 10px;
+    background-color: var(--box-background);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.warning {
+    color: orange;
+}
+
+.over {
+    color: red;
+    font-weight: bold;
+}
+
+/* Dark theme */
+body.dark {
+    --background: #222;
+    --text: white;
+    --box-background: #333;
+    --border: #666;
+}
+
