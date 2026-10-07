@@ -1,0 +1,121 @@
+﻿
+/* Basic page setup */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+    line-height: 1.6;
+}
+
+/* Main container */
+main {
+    width: 90%;
+    max-width: 900px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Page heading */
+h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Button and input section */
+#load-users {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+#load-users:hover {
+    background: #1d4ed8;
+}
+
+#load-users:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+#filter-input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+#filter-input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+/* Status message */
+#status {
+    margin: 20px 0;
+    padding: 10px;
+    background: #eef2ff;
+    border-radius: 6px;
+}
+
+/* User list */
+#users-list {
+    list-style: none;
+    display: grid;
+    gap: 15px;
+}
+
+/* Individual user */
+#users-list li {
+    padding: 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+#users-list h2 {
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+#users-list p {
+    margin: 3px 0;
+    color: #555;
+}
+
+/* Responsive layout */
+@media (max-width: 600px) {
+    main {
+        width: 95%;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    #load-users {
+        width: 100%;
+    }
+}
