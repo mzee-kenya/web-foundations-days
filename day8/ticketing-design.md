@@ -1,4 +1,4 @@
-﻿# TicketHub — Event Ticketing System Design
+# TicketHub — Event Ticketing System Design
 
 ## 1. Requirements
 
@@ -405,6 +405,7 @@ CREATE TABLE seats (
     section VARCHAR(50) NOT NULL,
     seat_number VARCHAR(50) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'available' CHECK (status IN ('available', 'held', 'sold')),
 
     FOREIGN KEY (event_id) REFERENCES events(event_id),
     UNIQUE (event_id, seat_number)
@@ -424,7 +425,7 @@ CREATE TABLE order_items (
     order_item_id BIGINT PRIMARY KEY,
     order_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
-    seat_id BIGINT NOT NULL,
+    seat_id BIGINT NOT NULL UNIQUE,
     price DECIMAL(10,2) NOT NULL,
 
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
@@ -532,22 +533,34 @@ If another customer attempts to hold the same seat at the same time, that transa
 
 ## Purchase Transaction
 
-Payment and ticket confirmation must also be handled carefully.
+Payment and ticket confirmation must be handled carefully because an external payment provider may take several seconds to respond. The system should not keep a database transaction open while waiting for the provider.
 
-The system should:
+The purchase process should follow these steps:
 
-1. Start a transaction.
-2. Lock the relevant seat/hold record.
-3. Verify that the hold belongs to the customer.
-4. Verify that the hold has not expired.
-5. Confirm the payment.
-6. Create the order.
-7. Create the order item.
-8. Mark the hold as completed.
-9. Commit the transaction.
+1. Verify that the customer has an active seat hold.
+2. Request payment from the payment provider outside the database transaction. Use an idempotency key so that retries do not create duplicate charges.
+3. After verifying successful payment, start a short database transaction.
+4. Lock the relevant seat and hold records using `SELECT ... FOR UPDATE`.
+5. Verify that the hold belongs to the customer, is still active, and has not expired. Also confirm that the seat has not already been sold.
+6. Create the order and order item.
+7. Update the seat status to `sold` and the hold status to `completed`.
+8. Commit the transaction.
 
-If any important operation fails, the transaction can roll back.
+If the database transaction fails after payment succeeds, the system must not issue a ticket. It should record and reconcile the payment, then safely retry the operation or refund the customer when necessary. Payment callbacks and retries must be idempotent to prevent duplicate orders.
 
+## Expired Seat Holds
+
+A background worker should periodically find active holds whose expiration time has passed.
+
+For each expired hold, the worker should:
+
+1. Start a short database transaction.
+2. Lock the hold and its corresponding seat.
+3. Check that the hold is still active and expired and that the seat has not been sold or assigned to a newer valid hold.
+4. Mark the hold as `expired` and the seat as `available`.
+5. Commit the transaction.
+
+The worker must never release a seat that has already been sold or is protected by a newer valid hold. Database locks and status checks help prevent conflicting updates.
 ## Database Constraints
 
 The database should also enforce uniqueness.
